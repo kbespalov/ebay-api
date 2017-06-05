@@ -1,0 +1,8 @@
+# configuration file of api access to the ebay sandbox
+
+api.sandbox.ebay.com:
+    compatability: 989
+    appid: appid
+    certid: certif
+    devid: devid
+    token: token
