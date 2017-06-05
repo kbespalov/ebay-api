@@ -134,7 +134,7 @@ def get_parser():
 
 def get_config():
     parser = get_parser()
-    namespace = parser.parse_args(['update'])
+    namespace = parser.parse_args(sys.argv[1:])
     with open(namespace.config_file) as f:
         c = yaml.load(f)
     if not namespace.domain:
@@ -152,4 +152,5 @@ def get_config():
 
 def start():
     c = get_config()
-    c.cmd(c)
+    if c.cmd:
+        c.cmd(c)
