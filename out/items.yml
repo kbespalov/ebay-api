@@ -1,32 +1,28 @@
 110201097051:
-  BuyItNowPrice:
-    _currencyID: USD
+  price:
+    currency: USD
     value: 200.0
-  ListingDetails:
-    ViewItemURL: http://cgi.sandbox.ebay.com/Iphone-10S-/110201097051
-  QuantityAvailable: 1000
-  Title: Iphone 10S+
+  quantity: 1000
+  title: Iphone 10S+
+  url: http://cgi.sandbox.ebay.com/Iphone-10S-/110201097051
 110201097088:
-  BuyItNowPrice:
-    _currencyID: USD
+  price:
+    currency: USD
     value: 1000.0
-  ListingDetails:
-    ViewItemURL: http://cgi.sandbox.ebay.com/AK-47-/110201097088
-  QuantityAvailable: 400
-  Title: AK-47
+  quantity: 400
+  title: AK-47
+  url: http://cgi.sandbox.ebay.com/AK-47-/110201097088
 110201097746:
-  BuyItNowPrice:
-    _currencyID: USD
+  price:
+    currency: USD
     value: 100.0
-  ListingDetails:
-    ViewItemURL: http://cgi.sandbox.ebay.com/use-ebay-api-/110201097746
-  QuantityAvailable: 1000
-  Title: How to use ebay api
+  quantity: 1000
+  title: How to use ebay api
+  url: http://cgi.sandbox.ebay.com/use-ebay-api-/110201097746
 110201097992:
-  BuyItNowPrice:
-    _currencyID: USD
-    value: 5.0
-  ListingDetails:
-    ViewItemURL: http://cgi.sandbox.ebay.com/My-Book-/110201097992
-  QuantityAvailable: 1
-  Title: My Book
+  price:
+    currency: USD
+    value: 10.0
+  quantity: 5
+  title: My Book
+  url: http://cgi.sandbox.ebay.com/My-Book-/110201097992

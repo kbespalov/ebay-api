@@ -1,8 +1,11 @@
 # configuration file of api access to the ebay sandbox
 
+active_domain: api.sandbox.ebay.com
+items_store: ./out/items.yml
+
 api.sandbox.ebay.com:
     compatability: 989
-    appid: appid
-    certid: certif
-    devid: devid
-    token: token
+    appid: -
+    certid: -
+    devid: -
+    token: -

@@ -64,20 +64,7 @@ def update(config, changes):
     api = Trading(domain=config.domain, config_file=config.config_file)
     for change in changes:
         try:
-            if 'BuyItNowPrice' in change['Item']:
-                price = change['Item']['BuyItNowPrice']
-                price = {
-                    '#text': price['value'],
-                    '@attrs': {
-                        'currencyID': price['_currencyID']
-                    }
-                }
-                change['Item']['StartPrice'] = price
-                del change['Item']['BuyItNowPrice']
-
-            change['Item']['CategoryMappingAllowed'] = True
-            response = api.execute('ReviseFixedPriceItem', change)
+            api.execute('ReviseFixedPriceItem', change)
             LOG.info('%s is successfully changed. ' % change['Item']['ItemID'])
-
         except ConnectionError as error:
             LOG.error(error)

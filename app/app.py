@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)-8s %(message)s')
 LOG = logging.getLogger(__name__)
 
 
-def print_dump(items):
+def print_items(items):
     """Print result of api.dump as table"""
     columns = ['item_id', 'title', 'quantity', 'price', 'url']
     table = prettytable.PrettyTable(columns)
@@ -24,19 +24,19 @@ def print_dump(items):
 
 def store_dump(items, file_path):
     """Store result of api.dump as yaml file"""
+
     formatted = {}
     for item in items:
         formatted[int(item.ItemID)] = {
-            'Title': item.Title,
-            'QuantityAvailable': int(item.QuantityAvailable),
-            'BuyItNowPrice': {
+            'title': item.Title,
+            'quantity': int(item.QuantityAvailable),
+            'price': {
                 'value': float(item.BuyItNowPrice.value),
-                '_currencyID': item.BuyItNowPrice._currencyID
+                'currency': item.BuyItNowPrice._currencyID
             },
-            'ListingDetails': {
-                'ViewItemURL': item.ListingDetails.ViewItemURL
-            }
+            'url': item.ListingDetails.ViewItemURL
         }
+
     with open(file_path, 'w') as f:
         yaml.dump(formatted, f, default_flow_style=False)
 
@@ -49,46 +49,56 @@ def load_dump(file_path):
 def dump(config):
     """Retrieve, print and store active items"""
     items = api.dump(config)
-    print_dump(items)
-    store_dump(items, config.file)
+    if items:
+        print_items(items)
+        store_dump(items, config.file)
 
 
 def update(config):
     """Load dumped items from yaml file and applies changes"""
 
+    def color(obj):
+        return '\033[92m' + str(obj) + '\033[0m'
+
     stored_items = load_dump(config.file)
     current_items = api.dump(config)
-    require_update = []
+
+    changes = []
+    changed_items = []
 
     for item in current_items:
         if int(item.ItemID) in stored_items:
             stored_item = stored_items[int(item.ItemID)]
             diff = {}
-            msg = '%s is changed from: %s to: %s'
+            stored = int(stored_item['quantity'])
+            current = int(item.QuantityAvailable)
+            if stored != current:
+                item.QuantityAvailable = color('%s > %s' % (current, stored))
+                diff['Quantity'] = stored
+            stored = stored_item['title']
+            current = item.Title
+            if stored != current:
+                diff['Title'] = stored
+                item.QuantityAvailable = color('%s > %s' % (current, stored))
 
-            quantity = int(stored_item['QuantityAvailable'])
-            if quantity != int(item.QuantityAvailable):
-                diff['QuantityAvailable'] = quantity
-                LOG.info(msg % ('QuantityAvailable', item.QuantityAvailable,
-                                quantity))
-
-            title = stored_item['Title']
-            if title != item.Title:
-                LOG.info(msg % ('Title', item.Title, title))
-                diff['Title'] = title
-
-            price = stored_item['BuyItNowPrice']
-            if price['value'] != float(item.BuyItNowPrice.value):
-                diff['BuyItNowPrice'] = price
-                LOG.info(msg % ('BuyItNowPrice', item.BuyItNowPrice.value,
-                                price['value']))
-
+            stored = stored_item['price']
+            current = float(item.BuyItNowPrice.value)
+            if stored['value'] != current:
+                diff['StartPrice'] = {
+                    '#text': stored['value'],
+                    '@attrs': {'currencyID': stored['currency']}
+                }
+                item.BuyItNowPrice.value = color('%s > %s' % (current, stored))
             if diff:
                 diff['ItemID'] = item.ItemID
-                require_update.append({'Item': diff})
+                changes.append({'Item': diff})
+                changed_items.append(item)
 
-    if require_update:
-        api.update(config, require_update)
+    if changes:
+        print 'Changes:'
+        print_items(changed_items)
+        if raw_input('apply (y/N) ? ') == 'y':
+            api.update(config, changes)
     else:
         LOG.info('Nothing has changed.')
 
@@ -109,13 +119,11 @@ def get_parser():
     update_parser = subparsers.add_parser(cmd, help='update a list of items')
     update_parser.set_defaults(cmd=update)
 
-    # adding of common arguments
     for p in [dump_parser, update_parser]:
         p.add_argument('-c', '--config', dest='config_file',
                        default='./etc/ebay.yml',
                        help='a configuration file in yaml format')
         p.add_argument('-d', '--domain', dest='domain',
-                       default='api.sandbox.ebay.com',
                        help='default ebay api domain')
         p.add_argument('-f', '--file', dest='file',
                        default='./out/items.yml',
@@ -124,7 +132,24 @@ def get_parser():
     return base
 
 
-def start():
+def get_config():
     parser = get_parser()
-    namespace = parser.parse_args(sys.argv[1:])
-    namespace.cmd(namespace)
+    namespace = parser.parse_args(['update'])
+    with open(namespace.config_file) as f:
+        c = yaml.load(f)
+    if not namespace.domain:
+        if c.get('active_domain', None):
+            namespace.domain = c['active_domain']
+        else:
+            namespace.domain = 'api.sandbox.ebay.com'
+    if not namespace.file:
+        if c.get('items_store', None):
+            namespace.domain = c['items_store']
+        else:
+            namespace.file = './out/items.yml'
+    return namespace
+
+
+def start():
+    c = get_config()
+    c.cmd(c)

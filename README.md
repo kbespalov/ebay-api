@@ -1,14 +1,15 @@
 # ebay-api
-An example of ebay sandbox api usage.
+
+An example of ebay sandbox api app.
+
 Not for production usage.
 
 How to use:
 
-- Install reqiurements: `pip install -r requirements.txt`
+- Install requirements: `pip install -r requirements.txt`
 - Configure API access options like `appid`, `token` and `devid` in `./etc/ebay.yml` file.
 - Dump current list of active items:
    `python ./ebay-api/cmd.py dump`
-
    an output will be stored into `./out/items.yml` file.
 - Change reqiured fields at `./out/items.yml`
 - Do update:
