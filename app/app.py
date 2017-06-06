@@ -88,7 +88,8 @@ def update(config):
                     '#text': stored['value'],
                     '@attrs': {'currencyID': stored['currency']}
                 }
-                item.BuyItNowPrice.value = color('%s > %s' % (current, stored))
+                item.BuyItNowPrice.value = color(
+                    '%s > %s' % (current, stored['value']))
             if diff:
                 diff['ItemID'] = item.ItemID
                 changes.append({'Item': diff})

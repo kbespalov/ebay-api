@@ -22,7 +22,7 @@
 110201097992:
   price:
     currency: USD
-    value: 10.0
+    value: 20.0
   quantity: 11
   title: My Book
   url: http://cgi.sandbox.ebay.com/My-Book-/110201097992
